@@ -1,65 +1,103 @@
-import Image from "next/image";
+import Link from "next/link"
+import { ArrowRight, Package, MapPin, Truck } from "lucide-react"
+import { Header, BottomNav } from "@/components/layout"
+import { DashboardStats } from "@/components/dashboard"
+import { DeliveryCard } from "@/components/delivery/delivery-card"
+import { Button } from "@/components/ui/button"
+import { getDeliveries } from "@/app/actions/delivery"
 
-export default function Home() {
+export default async function HomePage() {
+  const result = await getDeliveries()
+  const deliveries = result.success ? result.deliveries?.slice(0, 3) ?? [] : []
+
+  // Calculate stats (in production, this would be a separate optimized query)
+  const allDeliveries = result.success ? result.deliveries ?? [] : []
+  const stats = {
+    total: allDeliveries.length,
+    inTransit: allDeliveries.filter((d) => d.status === "IN_TRANSIT").length,
+    delivered: allDeliveries.filter((d) => d.status === "DELIVERED").length,
+    pending: allDeliveries.filter((d) => d.status === "CREATED").length,
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-background pb-20">
+      <Header />
+
+      <main className="mx-auto max-w-lg px-4 py-6">
+        {/* Welcome Section */}
+        <section className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Bonjour 👋
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground mt-1">
+            Gérez vos livraisons en temps réel
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        </section>
+
+        {/* Stats */}
+        <section className="mb-6">
+          <DashboardStats stats={stats} />
+        </section>
+
+        {/* Quick Actions */}
+        <section className="mb-6">
+          <div className="flex gap-3">
+            <Link href="/deliveries/create" className="flex-1">
+              <Button className="w-full h-12 gap-2 text-base" size="lg">
+                <Package className="h-5 w-5" />
+                Nouvelle livraison
+              </Button>
+            </Link>
+            <Link href="/tracking" className="flex-1">
+              <Button variant="outline" className="w-full h-12 gap-2 text-base" size="lg">
+                <MapPin className="h-5 w-5" />
+                Suivi GPS
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* Recent Deliveries */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold">Récentes</h2>
+            <Link
+              href="/deliveries"
+              className="flex items-center gap-1 text-sm text-primary font-medium hover:underline"
+            >
+              Voir tout
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {deliveries.length === 0 ? (
+            <div className="rounded-xl border-2 border-dashed border-muted p-8 text-center">
+              <Truck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
+              <p className="text-muted-foreground">Aucune livraison pour le moment</p>
+              <Link href="/deliveries/create">
+                <Button variant="link" className="mt-2">
+                  Créer votre première livraison
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {deliveries.map((delivery) => (
+                <DeliveryCard
+                  key={delivery.id}
+                  id={delivery.id}
+                  status={delivery.status as any}
+                  description={delivery.deliveryPoint?.description}
+                  courierName={delivery.courier?.name}
+                  createdAt={delivery.createdAt}
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </main>
+
+      <BottomNav />
     </div>
-  );
+  )
 }

@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// Better Auth Tables
+// ============================================
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  phone         String?
+  role          String    @default("client") // admin, courier, client
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Address for Comoros context
+  city         String?
+  neighborhood String?
+  landmark     String?
+  latitude     Float?
+  longitude    Float?
+
+  sessions Session[]
+  accounts Account[]
+
+  // Application relations
+  deliveriesAssigned  Delivery[]     @relation("CourierDeliveries")
+  deliveriesRequested Delivery[]     @relation("ClientDeliveries")
+  deliveryLogs        DeliveryLog[]
+  products            Product[]      @relation("SellerProducts")
+  sellerSales         Delivery[]     @relation("SellerSales")
+  notifications       Notification[]
+  savedAddresses      SavedAddress[]
+
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  impersonatedBy String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verification")
+}
+
+// ============================================
+// Application Models
+// ============================================
+
+enum DeliveryStatus {
+  CREATED
+  ASSIGNED
+  IN_TRANSIT
+  ARRIVED_ZONE
+  DELIVERED
+  FAILED
+}
+
+model DeliveryPoint {
+  id                    String     @id @default(cuid())
+  latitude              Float
+  longitude             Float
+  description           String?
+  usageCount            Int        @default(1)
+  photos                Photo[]
+  destinationDeliveries Delivery[] @relation("DestinationPoint")
+  pickupDeliveries      Delivery[] @relation("PickupPoint")
+  createdAt             DateTime   @default(now())
+
+  @@index([latitude, longitude])
+}
+
+model Delivery {
+  id               String         @id @default(cuid())
+  status           DeliveryStatus @default(CREATED)
+  deliveryPointId  String
+  pickupPointId    String? // Point of collection
+  courierId        String?
+  clientId         String
+  items            Json?
+  confirmationCode String?
+
+  deliveryPoint DeliveryPoint    @relation("DestinationPoint", fields: [deliveryPointId], references: [id])
+  pickupPoint   DeliveryPoint?   @relation("PickupPoint", fields: [pickupPointId], references: [id])
+  courier       User?            @relation("CourierDeliveries", fields: [courierId], references: [id])
+  client        User             @relation("ClientDeliveries", fields: [clientId], references: [id])
+  proof         ProofOfDelivery?
+  logs          DeliveryLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sellerId  String? // Added seller relation
+  seller    User?    @relation("SellerSales", fields: [sellerId], references: [id])
+}
+
+model ProofOfDelivery {
+  id          String   @id @default(cuid())
+  deliveryId  String   @unique
+  photoUrl    String?
+  signature   String?
+  otp         String?
+  latitude    Float
+  longitude   Float
+  deliveredAt DateTime @default(now())
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id])
+}
+
+model Photo {
+  id              String @id @default(cuid())
+  url             String
+  deliveryPointId String
+
+  deliveryPoint DeliveryPoint @relation(fields: [deliveryPointId], references: [id])
+}
+
+model DeliveryLog {
+  id         String   @id @default(cuid())
+  deliveryId String
+  userId     String?
+  action     String
+  details    String?
+  createdAt  DateTime @default(now())
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  image       String?
+  sellerId    String
+  seller      User     @relation("SellerProducts", fields: [sellerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info") // info, success, warning, error
+  link      String? // Optionnel
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SavedAddress {
+  id           String   @id @default(cuid())
+  label        String
+  city         String?
+  neighborhood String?
+  landmark     String?
+  latitude     Float
+  longitude    Float
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@map("saved_address")
+}
