@@ -1,9 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { createDeliverySchema } from '@/lib/schemas';
 import { NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth-server';
 
 export async function GET(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const courierId = searchParams.get('courierId');
@@ -35,6 +40,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const json = await request.json();
     const result = createDeliverySchema.safeParse(json);
 
@@ -61,6 +71,7 @@ export async function POST(request: Request) {
         data: {
           deliveryPointId: point.id,
           status: 'CREATED',
+          clientId: session.user.id,
         },
       });
     });
