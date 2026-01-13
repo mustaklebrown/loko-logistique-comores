@@ -1,4 +1,6 @@
 
+export const dynamic = 'force-dynamic'
+
 import { LogoutButton } from "@/components/auth/logout-button"
 import { getUserLogs } from "@/app/actions/users"
 import { ProfileTabs } from "@/components/profile/profile-tabs"
@@ -13,12 +15,12 @@ import { getSavedAddresses } from "@/app/actions/saved-addresses"
 export default async function ProfilePage() {
     const session = await getSession()
     const [logsResult, addressesResult] = await Promise.all([
-        session ? getUserLogs() : { logs: [] },
-        session ? getSavedAddresses() : { addresses: [] }
+        session ? getUserLogs() : { success: false, logs: [] },
+        session ? getSavedAddresses() : { success: false, addresses: [] }
     ])
 
-    const logs = logsResult.logs || []
-    const savedAddresses = (addressesResult as any).success ? (addressesResult as any).addresses : []
+    const logs = (logsResult as any).success ? (logsResult as any).logs : []
+    const savedAddresses = (addressesResult as any).success ? ((addressesResult as any).addresses || []) : []
 
     return (
         <div className="min-h-screen bg-background pb-24">

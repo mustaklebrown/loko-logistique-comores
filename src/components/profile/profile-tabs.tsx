@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Loader2, User, Clock, Settings, HelpCircle, Save, Bell, Map as MapIcon, Navigation } from "lucide-react"
+import { MapPin, Loader2, User, Clock, Settings, HelpCircle, Save, Bell, Map as MapIcon, Navigation, Trash2 } from "lucide-react"
 import { updateUser } from "@/app/actions/users"
 import { Map } from "@/components/map"
 import { createSavedAddress, deleteSavedAddress } from "@/app/actions/saved-addresses"
@@ -30,6 +30,7 @@ export function ProfileTabs({ user, logs, savedAddresses: initialAddresses = [] 
     const [isSavingAddress, setIsSavingAddress] = useState(false)
     const [newAddrLabel, setNewAddrLabel] = useState("")
 
+
     // Address state (Main profile address)
     const [city, setCity] = useState(user.city || "")
     const [neighborhood, setNeighborhood] = useState(user.neighborhood || "")
@@ -41,33 +42,46 @@ export function ProfileTabs({ user, logs, savedAddresses: initialAddresses = [] 
     const router = useRouter()
 
     async function handleSaveNewAddress() {
-        if (!location || !newAddrLabel) {
-            toast.error("Veuillez donner un nom et choisir une position sur la carte")
-            return
+        if (!location) {
+            toast.error("Veuillez choisir une position sur la carte");
+            return;
         }
-        setIsSavingAddress(true)
+        if (!newAddrLabel) {
+            toast.error("Veuillez donner un nom à cette adresse (ex: Maison, Bureau)");
+            return;
+        }
+
+        setIsSavingAddress(true);
+        const loadingToast = toast.loading("Enregistrement de l'adresse...");
+
         try {
             const res = await createSavedAddress({
                 label: newAddrLabel,
-                city,
-                neighborhood,
-                landmark,
+                city: city || "Moroni",
+                neighborhood: neighborhood || "Centre-ville",
+                landmark: landmark || "",
                 latitude: location.lat,
                 longitude: location.lng
-            })
+            });
+
+            toast.dismiss(loadingToast);
+
             if (res.error) {
-                toast.error(res.error)
+                toast.error(res.error);
             } else {
-                toast.success("Adresse enregistrée")
-                setNewAddrLabel("")
-                router.refresh()
-                // Update local list (optional if router.refresh is enough, but for better UX:)
-                if (res.address) setAddresses([res.address, ...addresses])
+                toast.success("Adresse enregistrée avec succès !");
+                setNewAddrLabel("");
+                if (res.success && res.address) {
+                    setAddresses(prev => [res.address, ...prev]);
+                }
+                router.refresh();
             }
         } catch (e) {
-            toast.error("Erreur de sauvegarde")
+            console.error("handleSaveNewAddress error:", e);
+            toast.dismiss(loadingToast);
+            toast.error("Une erreur réseau est survenue lors de la sauvegarde");
         } finally {
-            setIsSavingAddress(false)
+            setIsSavingAddress(false);
         }
     }
 
@@ -224,7 +238,7 @@ export function ProfileTabs({ user, logs, savedAddresses: initialAddresses = [] 
                                 <Button
                                     variant="secondary"
                                     onClick={handleSaveNewAddress}
-                                    disabled={isSavingAddress || !newAddrLabel || !location}
+                                    disabled={isSavingAddress}
                                     className="h-10 px-4 font-bold text-xs"
                                 >
                                     {isSavingAddress ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Save className="h-3 w-3 mr-1" />}
@@ -251,9 +265,9 @@ export function ProfileTabs({ user, logs, savedAddresses: initialAddresses = [] 
                                             <MapPin className="h-5 w-5 text-primary" />
                                         </div>
                                         <div>
-                                            <p className="font-bold text-sm">{addr.label}</p>
+                                            <p className="font-bold text-sm">{addr.label || "Adresse sans nom"}</p>
                                             <p className="text-[10px] text-muted-foreground">
-                                                {addr.city}, {addr.neighborhood}
+                                                {addr.city || "Ville non précisée"}, {addr.neighborhood || "Quartier non précisé"}
                                             </p>
                                         </div>
                                     </div>
@@ -278,7 +292,7 @@ export function ProfileTabs({ user, logs, savedAddresses: initialAddresses = [] 
                                             onClick={() => handleDeleteAddress(addr.id)}
                                             className="h-8 w-8 text-destructive hover:bg-destructive/10"
                                         >
-                                            <Clock className="h-4 w-4" />
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </div>

@@ -381,12 +381,24 @@ export async function getDeliveries(filters?: {
   status?: string;
   courierId?: string;
   clientId?: string;
+  search?: string;
 }) {
   try {
     const where: any = {};
     if (filters?.status) where.status = filters.status;
     if (filters?.courierId) where.courierId = filters.courierId;
     if (filters?.clientId) where.clientId = filters.clientId;
+
+    if (filters?.search) {
+      where.OR = [
+        { id: { contains: filters.search, mode: 'insensitive' } },
+        {
+          deliveryPoint: {
+            description: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
+      ];
+    }
 
     const deliveries = await prisma.delivery.findMany({
       where,

@@ -39,6 +39,7 @@ export async function createSavedAddress(data: {
       },
     });
     revalidatePath('/profile');
+    revalidatePath('/', 'layout');
     return { success: true, address };
   } catch (e) {
     console.error('Failed to create address', e);
