@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select"
 import { updateUserRole } from "@/app/actions/users"
 import { toast } from "sonner"
+import Image from "next/image"
 
 interface UsersListProps {
     users: any[]
@@ -65,9 +66,9 @@ export function UsersList({ users: initialUsers }: UsersListProps) {
                             className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm overflow-hidden border border-primary/20">
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm overflow-hidden border border-primary/20 relative">
                                     {u.image ? (
-                                        <img src={u.image} alt={u.name} className="w-full h-full object-cover" />
+                                        <Image src={u.image} alt={u.name || "User Avatar"} fill className="object-cover" />
                                     ) : (
                                         u.name?.charAt(0).toUpperCase() || "U"
                                     )}

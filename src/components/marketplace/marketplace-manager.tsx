@@ -18,6 +18,7 @@ import {
     DialogTrigger,
     DialogFooter,
 } from "@/components/ui/dialog"
+import Image from "next/image"
 
 interface MarketplaceManagerProps {
     initialProducts: any[]
@@ -72,10 +73,12 @@ export function MarketplaceManager({ initialProducts }: MarketplaceManagerProps)
                             <Card className="overflow-hidden bg-card border-border shadow-sm group hover:shadow-md transition-all duration-300">
                                 <div className="aspect-video relative bg-muted overflow-hidden">
                                     {product.image ? (
-                                        <img
+                                        <Image
                                             src={product.image}
                                             alt={product.name}
-                                            className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            className="object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-muted-foreground">

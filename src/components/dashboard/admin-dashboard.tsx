@@ -37,6 +37,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { updateUserRole } from "@/app/actions/users";
 import { toast } from "sonner";
+import Image from "next/image"
 
 interface AdminDashboardProps {
     user: {
@@ -248,9 +249,9 @@ export function AdminDashboard({ user, users = [], stats, recentDeliveries = [] 
                                         className="flex items-center justify-between p-4 bg-muted/30 rounded-xl"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold relative overflow-hidden">
                                                 {u.image ? (
-                                                    <img src={u.image} alt={u.name} className="w-full h-full rounded-full object-cover" />
+                                                    <Image src={u.image} alt={u.name || "User"} fill className="object-cover" />
                                                 ) : (
                                                     u.name?.charAt(0).toUpperCase() || "U"
                                                 )}

@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 interface SellerDashboardProps {
     user: any
@@ -153,9 +154,9 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
                             {products.map((product) => (
                                 <Card key={product.id} className="overflow-hidden bg-card border-border shadow-sm">
                                     <div className="flex">
-                                        <div className="w-24 bg-muted flex items-center justify-center">
+                                        <div className="w-24 h-24 bg-muted flex items-center justify-center relative shrink-0">
                                             {product.image ? (
-                                                <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                                                <Image src={product.image} alt={product.name} fill className="object-cover" />
                                             ) : (
                                                 <ShoppingBag className="h-8 w-8 text-muted-foreground" />
                                             )}

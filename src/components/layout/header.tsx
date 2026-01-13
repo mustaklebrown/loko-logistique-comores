@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "./theme-toggle"
@@ -15,8 +16,14 @@ export function Header({ title = "Loko" }: HeaderProps) {
         <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
             <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-                        L
+                    <div className="relative h-8 w-8 overflow-hidden rounded-lg">
+                        <Image
+                            src="/loko.png"
+                            alt="Loko Logo"
+                            fill
+                            className="object-cover"
+                            priority
+                        />
                     </div>
                     <span className="text-lg font-semibold tracking-tight">{title}</span>
                 </Link>

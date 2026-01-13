@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { LogIn } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { getSavedAddresses } from "@/app/actions/saved-addresses"
 
 export default async function ProfilePage() {
@@ -33,11 +34,14 @@ export default async function ProfilePage() {
                         <Card className="border-none shadow-none bg-transparent">
                             <div className="flex flex-col items-center gap-4 text-center">
                                 {session.user.image ? (
-                                    <img
-                                        src={session.user.image}
-                                        alt={session.user.name || "User"}
-                                        className="h-24 w-24 rounded-full object-cover bg-muted ring-4 ring-background shadow-lg"
-                                    />
+                                    <div className="relative h-24 w-24 overflow-hidden rounded-full ring-4 ring-background shadow-lg bg-muted">
+                                        <Image
+                                            src={session.user.image}
+                                            alt={session.user.name || "User"}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="h-24 w-24 rounded-full bg-linear-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground text-3xl font-bold ring-4 ring-background shadow-lg">
                                         {session.user.name?.charAt(0).toUpperCase() || "U"}

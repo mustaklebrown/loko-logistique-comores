@@ -13,9 +13,39 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Loko - Logistique Comores",
-  description: "SaaS Logistique & Dernier Kilomètre pour les Comores",
+  title: {
+    default: "Loko - Logistique & Dernier Kilomètre aux Comores",
+    template: "%s | Loko"
+  },
+  description: "La plateforme logistique de référence aux Comores. Livraison rapide, suivi en temps réel et solutions pour e-commerce.",
+  keywords: ["logistique", "Comores", "livraison", "dernier kilomètre", "e-commerce", "Moroni", "transport"],
+  authors: [{ name: "Loko Team" }],
+  creator: "Loko",
+  openGraph: {
+    type: "website",
+    locale: "fr_KM",
+    url: "https://loko.km",
+    title: "Loko - Logistique & Dernier Kilomètre",
+    description: "Simplifiez vos livraisons aux Comores avec Loko. Suivi GPS et fiabilité garantie.",
+    siteName: "Loko",
+    images: [{
+      url: "/loko.png",
+      width: 512,
+      height: 512,
+      alt: "Loko Logo"
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Loko - Logistique Comores",
+    description: "Le futur de la logistique aux Comores est ici.",
+    images: ["/loko.png"],
+  },
   manifest: "/manifest.json",
+  icons: {
+    icon: "/loko.png",
+    apple: "/loko.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
