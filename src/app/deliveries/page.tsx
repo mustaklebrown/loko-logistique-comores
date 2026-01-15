@@ -24,11 +24,14 @@ export default async function DeliveriesPage({
     }
 
     // Role-based filtering
-    if (session?.user.role === 'client') {
-        filters.clientId = session.user.id
+    if (session?.user) {
+        if (session.user.role === 'client') {
+            filters.clientId = session.user.id
+        }
     }
 
-    const result = await getDeliveries(filters)
+    // Only fetch if logged in
+    const result = session?.user ? await getDeliveries(filters) : { success: true, deliveries: [] }
     const deliveries = result.success ? result.deliveries ?? [] : []
 
     return (
@@ -47,13 +50,15 @@ export default async function DeliveriesPage({
                             </div>
                             <h3 className="text-lg font-semibold mb-1">Aucune livraison</h3>
                             <p className="text-sm text-muted-foreground mb-4">
-                                {params.search || params.status
-                                    ? "Aucun résultat pour vos filtres actuels"
-                                    : "Commencez par créer votre première livraison"}
+                                {!session?.user
+                                    ? "Connectez-vous pour voir vos livraisons"
+                                    : (params.search || params.status
+                                        ? "Aucun résultat pour vos filtres actuels"
+                                        : "Commencez par créer votre première livraison")}
                             </p>
                             {!params.search && !params.status && (
-                                <Link href="/deliveries/create">
-                                    <Button>Créer une livraison</Button>
+                                <Link href={session?.user ? "/deliveries/create" : "/login"}>
+                                    <Button>{session?.user ? "Créer une livraison" : "Se connecter"}</Button>
                                 </Link>
                             )}
                         </div>

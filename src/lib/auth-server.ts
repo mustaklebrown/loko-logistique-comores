@@ -2,10 +2,18 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 
 export async function getSession() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  return session;
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    return session;
+  } catch (error) {
+    console.warn(
+      'Failed to fetch session (likely offline/DB unreachable):',
+      error
+    );
+    return null;
+  }
 }
 
 export async function requireAuth() {

@@ -65,6 +65,7 @@ export const viewport = {
 
 import { Providers } from "@/components/providers";
 import { OfflineAlert } from "@/components/layout/offline-alert";
+import { ServiceWorkerRegister } from "@/components/sw-register";
 
 export default function RootLayout({
   children,
@@ -78,6 +79,7 @@ export default function RootLayout({
       >
         <Providers>
           <OfflineAlert />
+          <ServiceWorkerRegister />
           {children}
         </Providers>
       </body>

@@ -30,30 +30,51 @@ export default async function DashboardPage() {
 
     switch (userRole) {
         case "admin":
-            const usersResult = await getAllUsers();
-            const adminStatsResult = await getAdminStats();
-            return <AdminDashboard
-                user={sanitizedUser}
-                users={usersResult.users || []}
-                stats={adminStatsResult.stats}
-                recentDeliveries={adminStatsResult.recentDeliveries}
-            />;
+            try {
+                const [usersResult, adminStatsResult] = await Promise.all([
+                    getAllUsers(),
+                    getAdminStats()
+                ]);
+                return <AdminDashboard
+                    user={sanitizedUser}
+                    users={usersResult.users || []}
+                    stats={adminStatsResult.stats}
+                    recentDeliveries={adminStatsResult.recentDeliveries}
+                />;
+            } catch (e) {
+                console.error("Admin dash offline/error", e)
+                return <AdminDashboard user={sanitizedUser} users={[]} stats={{ totalDeliveries: 0, activeCouriers: 0, deliveryPoints: 0, totalClients: 0 }} recentDeliveries={[]} />
+            }
         case "courier":
-            const courierDeliveries = await getDeliveries({ courierId: session.user.id });
-            return <CourierDashboard user={sanitizedUser} deliveries={courierDeliveries.deliveries || []} />;
+            try {
+                const courierDeliveries = await getDeliveries({ courierId: session.user.id });
+                return <CourierDashboard user={sanitizedUser} deliveries={courierDeliveries.deliveries || []} />;
+            } catch (e) {
+                return <CourierDashboard user={sanitizedUser} deliveries={[]} />;
+            }
         case "seller":
-            const productsResult = await getSellerProducts();
-            const statsResult = await getSellerStats();
-            const deliveriesResult = await getSellerDeliveries();
-            return <SellerDashboard
-                user={sanitizedUser}
-                products={productsResult.products || []}
-                stats={statsResult.stats || { products: 0, sales: 0, revenue: 0 }}
-                deliveries={deliveriesResult.deliveries || []}
-            />;
+            try {
+                const [productsResult, statsResult, deliveriesResult] = await Promise.all([
+                    getSellerProducts(),
+                    getSellerStats(),
+                    getSellerDeliveries()
+                ]);
+                return <SellerDashboard
+                    user={sanitizedUser}
+                    products={productsResult.products || []}
+                    stats={statsResult.stats || { products: 0, sales: 0, revenue: 0 }}
+                    deliveries={deliveriesResult.deliveries || []}
+                />;
+            } catch (e) {
+                return <SellerDashboard user={sanitizedUser} products={[]} stats={{ products: 0, sales: 0, revenue: 0 }} deliveries={[]} />;
+            }
         case "client":
         default:
-            const { deliveries } = await getDeliveries({ clientId: session.user.id });
-            return <ClientDashboard user={sanitizedUser} deliveries={deliveries || []} />;
+            try {
+                const { deliveries } = await getDeliveries({ clientId: session.user.id });
+                return <ClientDashboard user={sanitizedUser} deliveries={deliveries || []} />;
+            } catch (e) {
+                return <ClientDashboard user={sanitizedUser} deliveries={[]} />;
+            }
     }
 }

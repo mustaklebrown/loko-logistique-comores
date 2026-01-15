@@ -21,7 +21,8 @@ import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { saveToOfflineStorage, OFFLINE_CACHE_KEYS } from "@/lib/offline-storage";
+import { saveToOfflineStorage, getFromOfflineStorage, OFFLINE_CACHE_KEYS } from "@/lib/offline-storage";
+import { useOffline } from "@/hooks/use-offline";
 
 interface ClientDashboardProps {
     user: {
@@ -60,13 +61,27 @@ const statusIcons: Record<string, typeof CheckCircle> = {
 export function ClientDashboard({ user, deliveries }: ClientDashboardProps) {
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [localDeliveries, setLocalDeliveries] = useState(deliveries);
+    const isOffline = useOffline();
 
-    // Cache data for offline use
+    // Cache data for offline use or load from cache
     useEffect(() => {
-        if (deliveries) {
+        if (deliveries && deliveries.length > 0) {
+            setLocalDeliveries(deliveries);
             saveToOfflineStorage(OFFLINE_CACHE_KEYS.DELIVERIES + '_client', deliveries);
+        } else if (deliveries.length === 0) {
+            // Try to load from cache if server returns empty (potential offline mode)
+            const cached = getFromOfflineStorage<any[]>(OFFLINE_CACHE_KEYS.DELIVERIES + '_client');
+            if (cached && cached.length > 0) {
+                setLocalDeliveries(cached);
+                if (!isOffline) {
+                    toast("Données chargées depuis le cache local");
+                }
+            }
         }
-    }, [deliveries]);
+    }, [deliveries, isOffline]);
+
+    const activeDeliveries = localDeliveries; // Use localDeliveries instead of deliveries prop below
 
     const handleSignOut = async () => {
         await signOut();
@@ -85,8 +100,8 @@ export function ClientDashboard({ user, deliveries }: ClientDashboardProps) {
         setIsDeleting(null);
     };
 
-    const deliveredCount = deliveries.filter(d => d.status === "DELIVERED").length;
-    const pendingCount = deliveries.filter(d => d.status !== "DELIVERED").length;
+    const deliveredCount = activeDeliveries.filter(d => d.status === "DELIVERED").length;
+    const pendingCount = activeDeliveries.filter(d => d.status !== "DELIVERED").length;
 
     return (
         <div className="min-h-screen bg-background pb-24">

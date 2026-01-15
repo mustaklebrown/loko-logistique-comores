@@ -5,13 +5,24 @@ import { DashboardStats } from "@/components/dashboard"
 import { DeliveryCard } from "@/components/delivery/delivery-card"
 import { Button } from "@/components/ui/button"
 import { getDeliveries } from "@/app/actions/delivery"
+import { getSession } from "@/lib/auth-server"
 
 export default async function HomePage() {
-  const result = await getDeliveries()
-  const deliveries = result.success ? result.deliveries?.slice(0, 3) ?? [] : []
+  const session = await getSession()
+
+  let deliveries: any[] = []
+  let allDeliveries: any[] = []
+
+  if (session?.user) {
+    const result = await getDeliveries({ clientId: session.user.id })
+    if (result.success) {
+      allDeliveries = result.deliveries || []
+      deliveries = allDeliveries.slice(0, 3)
+    }
+  }
 
   // Calculate stats (in production, this would be a separate optimized query)
-  const allDeliveries = result.success ? result.deliveries ?? [] : []
+  // If not logged in, allDeliveries is empty, so stats are 0
   const stats = {
     total: allDeliveries.length,
     inTransit: allDeliveries.filter((d) => d.status === "IN_TRANSIT").length,
@@ -27,7 +38,7 @@ export default async function HomePage() {
         {/* Welcome Section */}
         <section className="mb-6">
           <h1 className="text-2xl font-bold tracking-tight">
-            Bonjour 👋
+            Bonjour {session?.user?.name ? `${session.user.name.split(' ')[0]}` : ''} 👋
           </h1>
           <p className="text-muted-foreground mt-1">
             Gérez vos livraisons en temps réel
@@ -73,10 +84,10 @@ export default async function HomePage() {
           {deliveries.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-muted p-8 text-center">
               <Truck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-              <p className="text-muted-foreground">Aucune livraison pour le moment</p>
-              <Link href="/deliveries/create">
+              <p className="text-muted-foreground">{session?.user ? "Aucune livraison pour le moment" : "Connectez-vous pour voir vos livraisons"}</p>
+              <Link href={session?.user ? "/deliveries/create" : "/login"}>
                 <Button variant="link" className="mt-2">
-                  Créer votre première livraison
+                  {session?.user ? "Créer votre première livraison" : "Se connecter"}
                 </Button>
               </Link>
             </div>

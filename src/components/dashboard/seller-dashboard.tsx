@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Plus, Package, DollarSign, TrendingUp, ShoppingBag, Edit, Trash2, Home, MapPin, WifiOff } from "lucide-react"
+import { Plus, Package, DollarSign, TrendingUp, ShoppingBag, Edit, Trash2, Home, MapPin, WifiOff, ImagePlus, Loader2, X } from "lucide-react"
 import { saveToOfflineStorage, OFFLINE_CACHE_KEYS } from "@/lib/offline-storage"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +16,8 @@ import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
+import { UploadButton } from "@/lib/uploadthing"
+import { useOffline } from "@/hooks/use-offline"
 
 interface SellerDashboardProps {
     user: any
@@ -47,6 +49,7 @@ const statusLabels: Record<string, string> = {
 export function SellerDashboard({ user, products, stats, deliveries = [] }: SellerDashboardProps) {
     const [isAddOpen, setIsAddOpen] = useState(false)
     const router = useRouter()
+    const isOffline = useOffline()
 
     // Cache data for offline use
     useEffect(() => {
@@ -71,12 +74,15 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
                         </Link>
                         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                             <DialogTrigger asChild>
-                                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Nouveau Produit
+                                <Button
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                                    disabled={isOffline}
+                                >
+                                    {isOffline ? <WifiOff className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                                    {isOffline ? "Hors ligne" : "Nouveau Produit"}
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="sm:max-w-md">
                                 <DialogHeader>
                                     <DialogTitle className="text-foreground">Ajouter un produit</DialogTitle>
                                 </DialogHeader>
@@ -144,7 +150,7 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
                             <div className="h-10 w-10 rounded-full bg-amber-500/10 flex items-center justify-center mb-2">
                                 <DollarSign className="h-5 w-5 text-amber-500" />
                             </div>
-                            <p className="text-2xl font-bold text-foreground">{stats.revenue.toLocaleString()}€</p>
+                            <p className="text-2xl font-bold text-foreground">{stats.revenue.toLocaleString()} KMF</p>
                             <p className="text-xs text-muted-foreground">Revenus</p>
                         </CardContent>
                     </Card>
@@ -173,7 +179,7 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
                                             <div className="flex items-start justify-between">
                                                 <div>
                                                     <h3 className="font-semibold text-foreground">{product.name}</h3>
-                                                    <p className="text-sm text-primary font-bold">{product.price.toLocaleString()}€</p>
+                                                    <p className="text-sm text-primary font-bold">{product.price.toLocaleString()} KMF</p>
                                                 </div>
                                             </div>
                                             <div className="mt-3 flex items-center justify-between">
@@ -262,6 +268,8 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
 
 function ProductForm({ onSuccess }: { onSuccess: () => void }) {
     const [isLoading, setIsLoading] = useState(false)
+    const [imageUrl, setImageUrl] = useState("")
+    const [isUploading, setIsUploading] = useState(false)
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -272,7 +280,7 @@ function ProductForm({ onSuccess }: { onSuccess: () => void }) {
             description: formData.get("description") as string,
             price: parseFloat(formData.get("price") as string),
             stock: parseInt(formData.get("stock") as string),
-            image: formData.get("image") as string,
+            image: imageUrl,
         }
 
         const res = await createProduct(data)
@@ -287,6 +295,76 @@ function ProductForm({ onSuccess }: { onSuccess: () => void }) {
 
     return (
         <form onSubmit={onSubmit} className="space-y-4 pt-4">
+            {/* Image Upload Section */}
+            <div className="space-y-2">
+                <Label className="text-foreground">Image du produit</Label>
+                <div className="flex flex-col items-center gap-4">
+                    {imageUrl ? (
+                        <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
+                            <Image
+                                src={imageUrl}
+                                alt="Aperçu"
+                                fill
+                                className="object-cover"
+                            />
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2 h-8 w-8"
+                                onClick={() => setImageUrl("")}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="w-full">
+                            <UploadButton
+                                endpoint="productImage"
+                                onUploadBegin={() => setIsUploading(true)}
+                                onClientUploadComplete={(res) => {
+                                    setIsUploading(false)
+                                    if (res?.[0]?.ufsUrl) {
+                                        setImageUrl(res[0].ufsUrl)
+                                        toast.success("Image téléchargée !")
+                                    }
+                                }}
+                                onUploadError={(error: Error) => {
+                                    setIsUploading(false)
+                                    toast.error(`Erreur: ${error.message}`)
+                                }}
+                                appearance={{
+                                    button: "w-full bg-muted hover:bg-muted/80 text-foreground border border-dashed border-border py-8 rounded-lg transition-colors",
+                                    allowedContent: "text-muted-foreground text-xs mt-2",
+                                }}
+                                content={{
+                                    button({ ready, isUploading }) {
+                                        if (isUploading) return (
+                                            <div className="flex items-center gap-2">
+                                                <Loader2 className="h-5 w-5 animate-spin" />
+                                                <span>Téléchargement...</span>
+                                            </div>
+                                        )
+                                        if (ready) return (
+                                            <div className="flex flex-col items-center gap-2">
+                                                <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                                                <span className="font-medium">Cliquer pour ajouter une image</span>
+                                            </div>
+                                        )
+                                        return "Préparation..."
+                                    },
+                                    allowedContent({ ready, isUploading }) {
+                                        if (!ready) return ""
+                                        if (isUploading) return ""
+                                        return "Image jusqu'à 4MB"
+                                    },
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+
             <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground">Nom</Label>
                 <Input id="name" name="name" required className="bg-background border-input text-foreground" />
@@ -297,7 +375,7 @@ function ProductForm({ onSuccess }: { onSuccess: () => void }) {
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="price" className="text-foreground">Prix (€)</Label>
+                    <Label htmlFor="price" className="text-foreground">Prix (KMF)</Label>
                     <Input id="price" name="price" type="number" step="0.01" required className="bg-background border-input text-foreground" />
                 </div>
                 <div className="space-y-2">
@@ -305,12 +383,17 @@ function ProductForm({ onSuccess }: { onSuccess: () => void }) {
                     <Input id="stock" name="stock" type="number" required className="bg-background border-input text-foreground" />
                 </div>
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="image" className="text-foreground">URL Image</Label>
-                <Input id="image" name="image" placeholder="https://..." className="bg-background border-input text-foreground" />
-            </div>
-            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
-                {isLoading ? "Envoi..." : "Enregistrer"}
+            <Button
+                type="submit"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                disabled={isLoading || isUploading}
+            >
+                {isLoading ? (
+                    <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Envoi...
+                    </>
+                ) : "Enregistrer"}
             </Button>
         </form>
     )
