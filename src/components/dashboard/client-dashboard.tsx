@@ -16,11 +16,12 @@ import {
 } from "lucide-react";
 import { deleteDelivery } from "@/app/actions/delivery";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { saveToOfflineStorage, OFFLINE_CACHE_KEYS } from "@/lib/offline-storage";
 
 interface ClientDashboardProps {
     user: {
@@ -59,6 +60,13 @@ const statusIcons: Record<string, typeof CheckCircle> = {
 export function ClientDashboard({ user, deliveries }: ClientDashboardProps) {
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+    // Cache data for offline use
+    useEffect(() => {
+        if (deliveries) {
+            saveToOfflineStorage(OFFLINE_CACHE_KEYS.DELIVERIES + '_client', deliveries);
+        }
+    }, [deliveries]);
 
     const handleSignOut = async () => {
         await signOut();

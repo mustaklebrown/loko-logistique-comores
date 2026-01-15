@@ -8,13 +8,17 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { createDelivery } from "@/app/actions/delivery"
 import { createSavedAddress } from "@/app/actions/saved-addresses"
-import { MapPin, Navigation, Check, Loader2, Plus, ShoppingCart, Globe, User, Save } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { MapPin, Check, Loader2, Plus, ShoppingCart, Save } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Image from "next/image"
+
+// Consistent number formatting to avoid hydration mismatch
+const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('fr-FR', { useGrouping: true }).format(price)
+}
 
 interface ShopClientProps {
     products: any[];
@@ -36,7 +40,7 @@ export function ShopClient({ products = [], user, savedAddresses = [] }: ShopCli
     )
 
     // Save address state
-    const [shouldSaveAddress, setShouldSaveAddress] = useState(false)
+    const [shouldSaveAddress, setShouldSaveAddress] = useState(savedAddresses.length === 0)
     const [newAddrLabel, setNewAddrLabel] = useState("")
 
     const router = useRouter()
@@ -72,6 +76,10 @@ export function ShopClient({ products = [], user, savedAddresses = [] }: ShopCli
             desc += ` - Saved: ${addr.label} (${addr.city}, ${addr.neighborhood})`;
         } else {
             // GPS mode
+            if (shouldSaveAddress && !newAddrLabel) {
+                toast.error("Veuillez donner un nom à cette adresse pour l'enregistrer")
+                return
+            }
             setIsLocating(true)
             try {
                 const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -131,20 +139,13 @@ export function ShopClient({ products = [], user, savedAddresses = [] }: ShopCli
 
     const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0)
 
-    const getModeLabel = () => {
-        if (addressMode === "profile") return "Mon adresse profil"
-        if (addressMode === "saved") {
-            const addr = savedAddresses.find(a => a.id === selectedSavedId)
-            return addr ? `Adresse: ${addr.label}` : "Choisir une adresse"
-        }
-        return "Position GPS actuelle"
-    }
 
     return (
         <div className="min-h-screen bg-background pb-24">
             <Header title="Boutique en ligne" />
 
             <main className="container max-w-lg mx-auto p-4 space-y-6">
+
 
                 {/* Cart Summary if items exist */}
                 {cart.length > 0 && (
@@ -155,95 +156,93 @@ export function ShopClient({ products = [], user, savedAddresses = [] }: ShopCli
                                     <ShoppingCart className="h-5 w-5 text-primary" />
                                     Panier ({cart.reduce((a, b) => a + b.quantity, 0)})
                                 </span>
-                                <span className="text-primary font-bold">{total.toLocaleString()} KMF</span>
+                                <span className="text-primary font-bold">{formatPrice(total)} KMF</span>
                             </CardTitle>
                         </CardHeader>
 
                         <CardContent className="space-y-4 pb-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Lieu de livraison</Label>
-                                <Select value={addressMode === "saved" ? `saved_${selectedSavedId}` : addressMode} onValueChange={(val) => {
-                                    if (val === "gps") {
-                                        setAddressMode("gps")
-                                    } else if (val === "profile") {
-                                        setAddressMode("profile")
-                                    } else if (val.startsWith("saved_")) {
-                                        setAddressMode("saved")
-                                        setSelectedSavedId(val.replace("saved_", ""))
-                                    }
-                                }}>
-                                    <SelectTrigger className="w-full h-14 rounded-xl bg-primary/5 border-primary/20 shadow-none focus:ring-primary/20 font-medium">
-                                        <div className="flex items-center gap-3 text-left">
-                                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                                {addressMode === "gps" ? <Globe className="h-4 w-4 text-primary" /> : <MapPin className="h-4 w-4 text-primary" />}
+                                <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">
+                                    Lieu de livraison
+                                </Label>
+
+                                <div className="grid gap-2">
+                                    {savedAddresses.map((addr) => (
+                                        <div
+                                            key={addr.id}
+                                            onClick={() => {
+                                                setAddressMode("saved")
+                                                setSelectedSavedId(addr.id)
+                                            }}
+                                            className={`
+                                                relative flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all
+                                                ${addressMode === "saved" && selectedSavedId === addr.id
+                                                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                                    : "border-border hover:border-primary/50 bg-card/50"}
+                                            `}
+                                        >
+                                            <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${addressMode === "saved" && selectedSavedId === addr.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                                                <MapPin className="h-4 w-4" />
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-xs font-bold leading-tight line-clamp-1">{getModeLabel()}</span>
-                                                <span className="text-[10px] text-muted-foreground leading-tight line-clamp-1">
-                                                    {addressMode === "profile" && `${user?.city || ""}, ${user?.neighborhood || ""}`}
-                                                    {addressMode === "saved" && savedAddresses.find(a => a.id === selectedSavedId)?.city}
-                                                    {addressMode === "gps" && "Utiliser ma position actuelle"}
-                                                </span>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold truncate">{addr.label}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{addr.city} {addr.neighborhood ? `- ${addr.neighborhood}` : ""}</p>
                                             </div>
+                                            {addressMode === "saved" && selectedSavedId === addr.id && (
+                                                <Check className="h-4 w-4 text-primary absolute top-3 right-3" />
+                                            )}
                                         </div>
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl border-border/50 shadow-2xl">
-                                        <SelectItem value="gps" className="py-3 focus:bg-primary/5 rounded-lg">
-                                            <div className="flex items-center gap-3">
-                                                <Globe className="h-4 w-4 text-muted-foreground" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs font-bold">Position GPS</span>
-                                                    <span className="text-[10px] text-muted-foreground">Ma position actuelle (Précis)</span>
-                                                </div>
-                                            </div>
-                                        </SelectItem>
-                                        {user?.latitude && (
-                                            <SelectItem value="profile" className="py-3 focus:bg-primary/5 rounded-lg">
-                                                <div className="flex items-center gap-3">
-                                                    <User className="h-4 w-4 text-muted-foreground" />
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-bold">Mon Profil</span>
-                                                        <span className="text-[10px] text-muted-foreground">{user.city}, {user.neighborhood}</span>
-                                                    </div>
-                                                </div>
-                                            </SelectItem>
+                                    ))}
+
+                                    <div
+                                        onClick={() => {
+                                            setAddressMode("gps")
+                                            setSelectedSavedId(null)
+                                        }}
+                                        className={`
+                                            relative flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all
+                                            ${addressMode === "gps"
+                                                ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                                : "border-border hover:border-primary/50 bg-card/50"}
+                                        `}
+                                    >
+                                        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${addressMode === "gps" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                                            <Plus className="h-4 w-4" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-bold">Nouvelle / Autre Adresse</p>
+                                            <p className="text-xs text-muted-foreground">Utiliser position GPS actuelle</p>
+                                        </div>
+                                        {addressMode === "gps" && (
+                                            <Check className="h-4 w-4 text-primary absolute top-3 right-3" />
                                         )}
-                                        {savedAddresses.map(addr => (
-                                            <SelectItem key={addr.id} value={`saved_${addr.id}`} className="py-3 focus:bg-primary/5 rounded-lg">
-                                                <div className="flex items-center gap-3">
-                                                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-bold">{addr.label}</span>
-                                                        <span className="text-[10px] text-muted-foreground">{addr.city}, {addr.neighborhood}</span>
-                                                    </div>
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Option to save GPS address */}
                             {addressMode === "gps" && (
-                                <div className="p-4 rounded-xl border border-dashed border-primary/20 bg-primary/5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="p-4 rounded-xl border border-dashed border-primary/20 bg-primary/5 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="flex flex-col gap-2">
+                                        <Label className="text-xs font-semibold">Nom de l'adresse (Requis pour enregistrer)</Label>
+                                        <Input
+                                            value={newAddrLabel}
+                                            onChange={(e) => setNewAddrLabel(e.target.value)}
+                                            placeholder="Ex: Maison, Bureau, Chez Maman..."
+                                            className="h-10 text-sm bg-background border-primary/20 rounded-lg focus-visible:ring-primary/20"
+                                        />
+                                    </div>
+
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <Save className="h-3 w-3 text-primary" />
-                                            <span className="text-[11px] font-bold text-primary uppercase">Enregistrer cette position ?</span>
+                                            <Save className="h-4 w-4 text-primary" />
+                                            <span className="text-xs font-medium text-muted-foreground">Sauvegarder pour la prochaine fois ?</span>
                                         </div>
                                         <Switch
                                             checked={shouldSaveAddress}
                                             onCheckedChange={setShouldSaveAddress}
                                         />
                                     </div>
-                                    {shouldSaveAddress && (
-                                        <Input
-                                            value={newAddrLabel}
-                                            onChange={(e) => setNewAddrLabel(e.target.value)}
-                                            placeholder="Nom (ex: Bureau, Chez Ami...)"
-                                            className="h-10 text-xs bg-background border-primary/20 rounded-lg focus-visible:ring-primary/20"
-                                        />
-                                    )}
                                 </div>
                             )}
 
@@ -305,7 +304,7 @@ export function ShopClient({ products = [], user, savedAddresses = [] }: ShopCli
                                     </div>
                                     <div className="absolute bottom-2 right-2">
                                         <div className="bg-primary/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                                            {product.price.toLocaleString()} KMF
+                                            {formatPrice(product.price)} KMF
                                         </div>
                                     </div>
                                 </div>

@@ -8033,9 +8033,12 @@ export namespace Prisma {
     courierId: string | null
     clientId: string | null
     confirmationCode: string | null
+    courierConfirmationCode: string | null
     createdAt: Date | null
     updatedAt: Date | null
     sellerId: string | null
+    confirmedByCourier: boolean | null
+    confirmedByClient: boolean | null
   }
 
   export type DeliveryMaxAggregateOutputType = {
@@ -8046,9 +8049,12 @@ export namespace Prisma {
     courierId: string | null
     clientId: string | null
     confirmationCode: string | null
+    courierConfirmationCode: string | null
     createdAt: Date | null
     updatedAt: Date | null
     sellerId: string | null
+    confirmedByCourier: boolean | null
+    confirmedByClient: boolean | null
   }
 
   export type DeliveryCountAggregateOutputType = {
@@ -8060,9 +8066,12 @@ export namespace Prisma {
     clientId: number
     items: number
     confirmationCode: number
+    courierConfirmationCode: number
     createdAt: number
     updatedAt: number
     sellerId: number
+    confirmedByCourier: number
+    confirmedByClient: number
     _all: number
   }
 
@@ -8075,9 +8084,12 @@ export namespace Prisma {
     courierId?: true
     clientId?: true
     confirmationCode?: true
+    courierConfirmationCode?: true
     createdAt?: true
     updatedAt?: true
     sellerId?: true
+    confirmedByCourier?: true
+    confirmedByClient?: true
   }
 
   export type DeliveryMaxAggregateInputType = {
@@ -8088,9 +8100,12 @@ export namespace Prisma {
     courierId?: true
     clientId?: true
     confirmationCode?: true
+    courierConfirmationCode?: true
     createdAt?: true
     updatedAt?: true
     sellerId?: true
+    confirmedByCourier?: true
+    confirmedByClient?: true
   }
 
   export type DeliveryCountAggregateInputType = {
@@ -8102,9 +8117,12 @@ export namespace Prisma {
     clientId?: true
     items?: true
     confirmationCode?: true
+    courierConfirmationCode?: true
     createdAt?: true
     updatedAt?: true
     sellerId?: true
+    confirmedByCourier?: true
+    confirmedByClient?: true
     _all?: true
   }
 
@@ -8189,9 +8207,12 @@ export namespace Prisma {
     clientId: string
     items: JsonValue | null
     confirmationCode: string | null
+    courierConfirmationCode: string | null
     createdAt: Date
     updatedAt: Date
     sellerId: string | null
+    confirmedByCourier: boolean
+    confirmedByClient: boolean
     _count: DeliveryCountAggregateOutputType | null
     _min: DeliveryMinAggregateOutputType | null
     _max: DeliveryMaxAggregateOutputType | null
@@ -8220,9 +8241,12 @@ export namespace Prisma {
     clientId?: boolean
     items?: boolean
     confirmationCode?: boolean
+    courierConfirmationCode?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sellerId?: boolean
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint?: boolean | DeliveryPointDefaultArgs<ExtArgs>
     pickupPoint?: boolean | Delivery$pickupPointArgs<ExtArgs>
     courier?: boolean | Delivery$courierArgs<ExtArgs>
@@ -8242,9 +8266,12 @@ export namespace Prisma {
     clientId?: boolean
     items?: boolean
     confirmationCode?: boolean
+    courierConfirmationCode?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sellerId?: boolean
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint?: boolean | DeliveryPointDefaultArgs<ExtArgs>
     pickupPoint?: boolean | Delivery$pickupPointArgs<ExtArgs>
     courier?: boolean | Delivery$courierArgs<ExtArgs>
@@ -8261,9 +8288,12 @@ export namespace Prisma {
     clientId?: boolean
     items?: boolean
     confirmationCode?: boolean
+    courierConfirmationCode?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sellerId?: boolean
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint?: boolean | DeliveryPointDefaultArgs<ExtArgs>
     pickupPoint?: boolean | Delivery$pickupPointArgs<ExtArgs>
     courier?: boolean | Delivery$courierArgs<ExtArgs>
@@ -8280,12 +8310,15 @@ export namespace Prisma {
     clientId?: boolean
     items?: boolean
     confirmationCode?: boolean
+    courierConfirmationCode?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sellerId?: boolean
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
-  export type DeliveryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "status" | "deliveryPointId" | "pickupPointId" | "courierId" | "clientId" | "items" | "confirmationCode" | "createdAt" | "updatedAt" | "sellerId", ExtArgs["result"]["delivery"]>
+  export type DeliveryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "status" | "deliveryPointId" | "pickupPointId" | "courierId" | "clientId" | "items" | "confirmationCode" | "courierConfirmationCode" | "createdAt" | "updatedAt" | "sellerId" | "confirmedByCourier" | "confirmedByClient", ExtArgs["result"]["delivery"]>
   export type DeliveryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     deliveryPoint?: boolean | DeliveryPointDefaultArgs<ExtArgs>
     pickupPoint?: boolean | Delivery$pickupPointArgs<ExtArgs>
@@ -8331,9 +8364,12 @@ export namespace Prisma {
       clientId: string
       items: Prisma.JsonValue | null
       confirmationCode: string | null
+      courierConfirmationCode: string | null
       createdAt: Date
       updatedAt: Date
       sellerId: string | null
+      confirmedByCourier: boolean
+      confirmedByClient: boolean
     }, ExtArgs["result"]["delivery"]>
     composites: {}
   }
@@ -8772,9 +8808,12 @@ export namespace Prisma {
     readonly clientId: FieldRef<"Delivery", 'String'>
     readonly items: FieldRef<"Delivery", 'Json'>
     readonly confirmationCode: FieldRef<"Delivery", 'String'>
+    readonly courierConfirmationCode: FieldRef<"Delivery", 'String'>
     readonly createdAt: FieldRef<"Delivery", 'DateTime'>
     readonly updatedAt: FieldRef<"Delivery", 'DateTime'>
     readonly sellerId: FieldRef<"Delivery", 'String'>
+    readonly confirmedByCourier: FieldRef<"Delivery", 'Boolean'>
+    readonly confirmedByClient: FieldRef<"Delivery", 'Boolean'>
   }
     
 
@@ -16064,9 +16103,12 @@ export namespace Prisma {
     clientId: 'clientId',
     items: 'items',
     confirmationCode: 'confirmationCode',
+    courierConfirmationCode: 'courierConfirmationCode',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    sellerId: 'sellerId'
+    sellerId: 'sellerId',
+    confirmedByCourier: 'confirmedByCourier',
+    confirmedByClient: 'confirmedByClient'
   };
 
   export type DeliveryScalarFieldEnum = (typeof DeliveryScalarFieldEnum)[keyof typeof DeliveryScalarFieldEnum]
@@ -16740,9 +16782,12 @@ export namespace Prisma {
     clientId?: StringFilter<"Delivery"> | string
     items?: JsonNullableFilter<"Delivery">
     confirmationCode?: StringNullableFilter<"Delivery"> | string | null
+    courierConfirmationCode?: StringNullableFilter<"Delivery"> | string | null
     createdAt?: DateTimeFilter<"Delivery"> | Date | string
     updatedAt?: DateTimeFilter<"Delivery"> | Date | string
     sellerId?: StringNullableFilter<"Delivery"> | string | null
+    confirmedByCourier?: BoolFilter<"Delivery"> | boolean
+    confirmedByClient?: BoolFilter<"Delivery"> | boolean
     deliveryPoint?: XOR<DeliveryPointScalarRelationFilter, DeliveryPointWhereInput>
     pickupPoint?: XOR<DeliveryPointNullableScalarRelationFilter, DeliveryPointWhereInput> | null
     courier?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -16761,9 +16806,12 @@ export namespace Prisma {
     clientId?: SortOrder
     items?: SortOrderInput | SortOrder
     confirmationCode?: SortOrderInput | SortOrder
+    courierConfirmationCode?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sellerId?: SortOrderInput | SortOrder
+    confirmedByCourier?: SortOrder
+    confirmedByClient?: SortOrder
     deliveryPoint?: DeliveryPointOrderByWithRelationInput
     pickupPoint?: DeliveryPointOrderByWithRelationInput
     courier?: UserOrderByWithRelationInput
@@ -16785,9 +16833,12 @@ export namespace Prisma {
     clientId?: StringFilter<"Delivery"> | string
     items?: JsonNullableFilter<"Delivery">
     confirmationCode?: StringNullableFilter<"Delivery"> | string | null
+    courierConfirmationCode?: StringNullableFilter<"Delivery"> | string | null
     createdAt?: DateTimeFilter<"Delivery"> | Date | string
     updatedAt?: DateTimeFilter<"Delivery"> | Date | string
     sellerId?: StringNullableFilter<"Delivery"> | string | null
+    confirmedByCourier?: BoolFilter<"Delivery"> | boolean
+    confirmedByClient?: BoolFilter<"Delivery"> | boolean
     deliveryPoint?: XOR<DeliveryPointScalarRelationFilter, DeliveryPointWhereInput>
     pickupPoint?: XOR<DeliveryPointNullableScalarRelationFilter, DeliveryPointWhereInput> | null
     courier?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -16806,9 +16857,12 @@ export namespace Prisma {
     clientId?: SortOrder
     items?: SortOrderInput | SortOrder
     confirmationCode?: SortOrderInput | SortOrder
+    courierConfirmationCode?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sellerId?: SortOrderInput | SortOrder
+    confirmedByCourier?: SortOrder
+    confirmedByClient?: SortOrder
     _count?: DeliveryCountOrderByAggregateInput
     _max?: DeliveryMaxOrderByAggregateInput
     _min?: DeliveryMinOrderByAggregateInput
@@ -16826,9 +16880,12 @@ export namespace Prisma {
     clientId?: StringWithAggregatesFilter<"Delivery"> | string
     items?: JsonNullableWithAggregatesFilter<"Delivery">
     confirmationCode?: StringNullableWithAggregatesFilter<"Delivery"> | string | null
+    courierConfirmationCode?: StringNullableWithAggregatesFilter<"Delivery"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Delivery"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Delivery"> | Date | string
     sellerId?: StringNullableWithAggregatesFilter<"Delivery"> | string | null
+    confirmedByCourier?: BoolWithAggregatesFilter<"Delivery"> | boolean
+    confirmedByClient?: BoolWithAggregatesFilter<"Delivery"> | boolean
   }
 
   export type ProofOfDeliveryWhereInput = {
@@ -17753,8 +17810,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
@@ -17773,9 +17833,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
@@ -17785,8 +17848,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
@@ -17805,9 +17871,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
@@ -17821,9 +17890,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
   export type DeliveryUpdateManyMutationInput = {
@@ -17831,8 +17903,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DeliveryUncheckedUpdateManyInput = {
@@ -17844,9 +17919,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProofOfDeliveryCreateInput = {
@@ -18868,9 +18946,12 @@ export namespace Prisma {
     clientId?: SortOrder
     items?: SortOrder
     confirmationCode?: SortOrder
+    courierConfirmationCode?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sellerId?: SortOrder
+    confirmedByCourier?: SortOrder
+    confirmedByClient?: SortOrder
   }
 
   export type DeliveryMaxOrderByAggregateInput = {
@@ -18881,9 +18962,12 @@ export namespace Prisma {
     courierId?: SortOrder
     clientId?: SortOrder
     confirmationCode?: SortOrder
+    courierConfirmationCode?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sellerId?: SortOrder
+    confirmedByCourier?: SortOrder
+    confirmedByClient?: SortOrder
   }
 
   export type DeliveryMinOrderByAggregateInput = {
@@ -18894,9 +18978,12 @@ export namespace Prisma {
     courierId?: SortOrder
     clientId?: SortOrder
     confirmationCode?: SortOrder
+    courierConfirmationCode?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sellerId?: SortOrder
+    confirmedByCourier?: SortOrder
+    confirmedByClient?: SortOrder
   }
 
   export type EnumDeliveryStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -20337,8 +20424,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     client: UserCreateNestedOneWithoutDeliveriesRequestedInput
@@ -20355,9 +20445,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
@@ -20377,8 +20470,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
@@ -20395,9 +20491,12 @@ export namespace Prisma {
     courierId?: string | null
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
@@ -20475,8 +20574,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
@@ -20494,8 +20596,11 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
@@ -20668,9 +20773,12 @@ export namespace Prisma {
     clientId?: StringFilter<"Delivery"> | string
     items?: JsonNullableFilter<"Delivery">
     confirmationCode?: StringNullableFilter<"Delivery"> | string | null
+    courierConfirmationCode?: StringNullableFilter<"Delivery"> | string | null
     createdAt?: DateTimeFilter<"Delivery"> | Date | string
     updatedAt?: DateTimeFilter<"Delivery"> | Date | string
     sellerId?: StringNullableFilter<"Delivery"> | string | null
+    confirmedByCourier?: BoolFilter<"Delivery"> | boolean
+    confirmedByClient?: BoolFilter<"Delivery"> | boolean
   }
 
   export type DeliveryUpsertWithWhereUniqueWithoutClientInput = {
@@ -21107,8 +21215,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
     client: UserCreateNestedOneWithoutDeliveriesRequestedInput
@@ -21125,9 +21236,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
@@ -21147,8 +21261,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
     client: UserCreateNestedOneWithoutDeliveriesRequestedInput
@@ -21165,9 +21282,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
@@ -21846,8 +21966,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
@@ -21865,9 +21988,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     logs?: DeliveryLogUncheckedCreateNestedManyWithoutDeliveryInput
   }
 
@@ -21892,8 +22018,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
@@ -21911,9 +22040,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
 
@@ -21982,8 +22114,11 @@ export namespace Prisma {
     status?: $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     deliveryPoint: DeliveryPointCreateNestedOneWithoutDestinationDeliveriesInput
     pickupPoint?: DeliveryPointCreateNestedOneWithoutPickupDeliveriesInput
     courier?: UserCreateNestedOneWithoutDeliveriesAssignedInput
@@ -22001,9 +22136,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
     proof?: ProofOfDeliveryUncheckedCreateNestedOneWithoutDeliveryInput
   }
 
@@ -22089,8 +22227,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
@@ -22108,9 +22249,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
   }
 
@@ -22599,9 +22743,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
   export type DeliveryCreateManyClientInput = {
@@ -22612,9 +22759,12 @@ export namespace Prisma {
     courierId?: string | null
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
   export type DeliveryLogCreateManyUserInput = {
@@ -22645,8 +22795,11 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
   export type NotificationCreateManyUserInput = {
@@ -22754,8 +22907,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     client?: UserUpdateOneRequiredWithoutDeliveriesRequestedNestedInput
@@ -22772,9 +22928,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
@@ -22787,9 +22946,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DeliveryUpdateWithoutClientInput = {
@@ -22797,8 +22959,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
@@ -22815,9 +22980,12 @@ export namespace Prisma {
     courierId?: NullableStringFieldUpdateOperationsInput | string | null
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
@@ -22830,9 +22998,12 @@ export namespace Prisma {
     courierId?: NullableStringFieldUpdateOperationsInput | string | null
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DeliveryLogUpdateWithoutUserInput = {
@@ -22897,8 +23068,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
@@ -22916,8 +23090,11 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
@@ -22931,8 +23108,11 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type NotificationUpdateWithoutUserInput = {
@@ -23014,9 +23194,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
   export type DeliveryCreateManyPickupPointInput = {
@@ -23027,9 +23210,12 @@ export namespace Prisma {
     clientId: string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: string | null
+    courierConfirmationCode?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sellerId?: string | null
+    confirmedByCourier?: boolean
+    confirmedByClient?: boolean
   }
 
   export type PhotoUpdateWithoutDeliveryPointInput = {
@@ -23052,8 +23238,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     pickupPoint?: DeliveryPointUpdateOneWithoutPickupDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
     client?: UserUpdateOneRequiredWithoutDeliveriesRequestedNestedInput
@@ -23070,9 +23259,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
@@ -23085,9 +23277,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DeliveryUpdateWithoutPickupPointInput = {
@@ -23095,8 +23290,11 @@ export namespace Prisma {
     status?: EnumDeliveryStatusFieldUpdateOperationsInput | $Enums.DeliveryStatus
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     deliveryPoint?: DeliveryPointUpdateOneRequiredWithoutDestinationDeliveriesNestedInput
     courier?: UserUpdateOneWithoutDeliveriesAssignedNestedInput
     client?: UserUpdateOneRequiredWithoutDeliveriesRequestedNestedInput
@@ -23113,9 +23311,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
     proof?: ProofOfDeliveryUncheckedUpdateOneWithoutDeliveryNestedInput
     logs?: DeliveryLogUncheckedUpdateManyWithoutDeliveryNestedInput
   }
@@ -23128,9 +23329,12 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     items?: NullableJsonNullValueInput | InputJsonValue
     confirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
+    courierConfirmationCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sellerId?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedByCourier?: BoolFieldUpdateOperationsInput | boolean
+    confirmedByClient?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type DeliveryLogCreateManyDeliveryInput = {

@@ -195,9 +195,12 @@ exports.Prisma.DeliveryScalarFieldEnum = {
   clientId: 'clientId',
   items: 'items',
   confirmationCode: 'confirmationCode',
+  courierConfirmationCode: 'courierConfirmationCode',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  sellerId: 'sellerId'
+  sellerId: 'sellerId',
+  confirmedByCourier: 'confirmedByCourier',
+  confirmedByClient: 'confirmedByClient'
 };
 
 exports.Prisma.ProofOfDeliveryScalarFieldEnum = {

@@ -2,7 +2,7 @@ import { PrismaClient } from '@/app/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = global as unknown as {
-  prisma: PrismaClient | undefined | null;
+  prisma_loko: PrismaClient | undefined | null;
 };
 
 const createPrismaClient = () => {
@@ -13,6 +13,6 @@ const createPrismaClient = () => {
 };
 
 // Singleton pattern for Prisma Client
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = globalForPrisma.prisma_loko ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma_loko = prisma;

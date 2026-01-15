@@ -6,6 +6,7 @@ import {
   assignCourierSchema,
   updateStatusSchema,
   proofOfDeliverySchema,
+  confirmReceiptSchema,
 } from '@/lib/schemas';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -61,6 +62,9 @@ export async function createDelivery(
 
   try {
     const confirmationCode = Math.floor(1000 + Math.random() * 9000).toString();
+    const courierConfirmationCode = Math.floor(
+      1000 + Math.random() * 9000
+    ).toString();
 
     const delivery = await prisma.$transaction(async (tx) => {
       // 0. Get Seller Address if available
@@ -109,6 +113,7 @@ export async function createDelivery(
           clientId: session.user.id,
           items: items ?? [],
           confirmationCode,
+          courierConfirmationCode,
           sellerId: sellerId,
         },
       });
@@ -156,7 +161,12 @@ export async function createDelivery(
       });
     }
 
-    return { success: true, deliveryId: delivery.id, confirmationCode };
+    return {
+      success: true,
+      deliveryId: delivery.id,
+      confirmationCode,
+      courierConfirmationCode,
+    };
   } catch (error) {
     console.error('Failed to create delivery:', error);
     return { error: 'Erreur lors de la création' };
@@ -200,10 +210,27 @@ export async function assignCourier(data: z.infer<typeof assignCourierSchema>) {
   if (!result.success) return { error: 'Invalid data' };
 
   try {
+    const session = await getSession();
+    if (!session) return { error: 'Non autorisé' };
+
     const delivery = await prisma.delivery.findUnique({
       where: { id: result.data.deliveryId },
-      select: { clientId: true },
+      select: { clientId: true, sellerId: true },
     });
+
+    if (!delivery) return { error: 'Livraison introuvable' };
+
+    // Authorization check
+    const isSeller = delivery.sellerId === session.user.id;
+    const isAdmin = session.user.role === 'admin';
+    const isCourierAccepting =
+      session.user.role === 'courier' &&
+      result.data.courierId === session.user.id &&
+      !delivery.sellerId;
+
+    if (!isSeller && !isAdmin && !isCourierAccepting) {
+      return { error: 'Non autorisé à assigner un coursier' };
+    }
 
     await prisma.delivery.update({
       where: { id: result.data.deliveryId },
@@ -304,76 +331,125 @@ export async function submitProof(data: z.infer<typeof proofOfDeliverySchema>) {
   try {
     const { deliveryId, otp, ...proofData } = result.data;
 
-    // Check confirmation code
-    // Check confirmation code and current status
     const delivery = await prisma.delivery.findUnique({
       where: { id: deliveryId },
       include: { proof: true },
     });
 
     if (!delivery) return { error: 'Delivery not found' };
-
-    // Idempotency check: if already delivered or has proof, return success
-    if (delivery.status === 'DELIVERED' || delivery.proof) {
-      return { success: true };
-    }
+    if (delivery.status === 'DELIVERED') return { success: true };
 
     if (delivery.confirmationCode && delivery.confirmationCode !== otp) {
-      return { error: 'Code de confirmation incorrect' };
+      return { error: 'Code client incorrect' };
     }
 
-    await prisma.$transaction([
-      prisma.proofOfDelivery.create({
-        data: {
-          deliveryId,
-          otp,
-          ...proofData,
-        },
-      }),
-      prisma.delivery.update({
+    await prisma.$transaction(async (tx) => {
+      // 1. Create or update proof
+      if (!delivery.proof) {
+        await tx.proofOfDelivery.create({
+          data: {
+            deliveryId,
+            otp,
+            ...proofData,
+          },
+        });
+      }
+
+      // 2. Mark as confirmed by courier
+      const updatedDelivery = await tx.delivery.update({
         where: { id: deliveryId },
-        data: { status: 'DELIVERED' },
-      }),
-    ]);
+        data: { confirmedByCourier: true },
+      });
 
-    await logAction(
-      deliveryId,
-      'DELIVERED',
-      'Preuve de livraison soumise (GPS + OTP)'
-    );
+      // 3. If both confirmed, mark as DELIVERED
+      if (updatedDelivery.confirmedByClient) {
+        await tx.delivery.update({
+          where: { id: deliveryId },
+          data: { status: 'DELIVERED' },
+        });
 
-    revalidatePath('/deliveries');
-
-    // Notify Client
-    await createNotification({
-      userId: delivery.clientId,
-      title: 'Livraison terminée !',
-      message: `Votre livraison #${deliveryId.slice(
-        0,
-        8
-      )} a été effectuée avec succès.`,
-      type: 'success',
-      link: `/deliveries/${deliveryId}`,
+        await logAction(
+          deliveryId,
+          'DELIVERED',
+          'Livraison terminée (Confirmation double)'
+        );
+      } else {
+        await logAction(
+          deliveryId,
+          'COURIER_CONFIRMED',
+          'Le coursier a confirmé la réception client'
+        );
+      }
     });
 
-    // Notify Seller
-    if (delivery.sellerId) {
-      await createNotification({
-        userId: delivery.sellerId,
-        title: 'Livraison effectuée',
-        message: `La commande #${deliveryId.slice(
-          0,
-          8
-        )} a bien été livrée au client.`,
-        type: 'success',
-        link: `/deliveries/${deliveryId}`,
-      });
-    }
+    revalidatePath('/deliveries');
+    revalidatePath(`/deliveries/${deliveryId}`);
 
     return { success: true };
   } catch (error) {
     console.error('Failed to submit proof:', error);
     return { error: 'Failed to submit proof' };
+  }
+}
+
+export async function confirmReceipt(
+  data: z.infer<typeof confirmReceiptSchema>
+) {
+  const result = confirmReceiptSchema.safeParse(data);
+  if (!result.success) return { error: 'Données invalides' };
+
+  try {
+    const session = await getSession();
+    if (!session) return { error: 'Non autorisé' };
+
+    const delivery = await prisma.delivery.findUnique({
+      where: { id: result.data.deliveryId },
+    });
+
+    if (!delivery) return { error: 'Livraison introuvable' };
+    if (delivery.clientId !== session.user.id) return { error: 'Non autorisé' };
+    if (delivery.status === 'DELIVERED') return { success: true };
+
+    if (
+      delivery.courierConfirmationCode &&
+      delivery.courierConfirmationCode !== result.data.otp
+    ) {
+      return { error: 'Code coursier incorrect' };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const updatedDelivery = await tx.delivery.update({
+        where: { id: result.data.deliveryId },
+        data: { confirmedByClient: true },
+      });
+
+      if (updatedDelivery.confirmedByCourier) {
+        await tx.delivery.update({
+          where: { id: result.data.deliveryId },
+          data: { status: 'DELIVERED' },
+        });
+
+        await logAction(
+          result.data.deliveryId,
+          'DELIVERED',
+          'Livraison terminée (Confirmation double)'
+        );
+      } else {
+        await logAction(
+          result.data.deliveryId,
+          'CLIENT_CONFIRMED',
+          'Le client a confirmé avoir reçu son colis'
+        );
+      }
+    });
+
+    revalidatePath('/deliveries');
+    revalidatePath(`/deliveries/${result.data.deliveryId}`);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to confirm receipt:', error);
+    return { error: 'Erreur lors de la confirmation' };
   }
 }
 

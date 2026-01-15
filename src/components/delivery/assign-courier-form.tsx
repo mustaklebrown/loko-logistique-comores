@@ -19,6 +19,7 @@ interface AssignCourierFormProps {
     deliveryId: string
     currentUserId?: string
     userRole?: string
+    isSeller?: boolean
 }
 
 type Courier = {
@@ -28,7 +29,7 @@ type Courier = {
     phone: string | null
 }
 
-export function AssignCourierForm({ deliveryId, currentUserId, userRole }: AssignCourierFormProps) {
+export function AssignCourierForm({ deliveryId, currentUserId, userRole, isSeller }: AssignCourierFormProps) {
     const [isPending, setIsPending] = useState(false)
     const [couriers, setCouriers] = useState<Courier[]>([])
     const [selectedCourier, setSelectedCourier] = useState<string>("")
@@ -139,7 +140,7 @@ export function AssignCourierForm({ deliveryId, currentUserId, userRole }: Assig
                 {isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                    "Assigner le coursier"
+                    isSeller ? "Confirmer & Assigner" : "Assigner le coursier"
                 )}
             </Button>
         </div>

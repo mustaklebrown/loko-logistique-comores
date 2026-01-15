@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Plus, Package, DollarSign, TrendingUp, ShoppingBag, Edit, Trash2, Home, MapPin } from "lucide-react"
+import { Plus, Package, DollarSign, TrendingUp, ShoppingBag, Edit, Trash2, Home, MapPin, WifiOff } from "lucide-react"
+import { saveToOfflineStorage, OFFLINE_CACHE_KEYS } from "@/lib/offline-storage"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -46,6 +47,13 @@ const statusLabels: Record<string, string> = {
 export function SellerDashboard({ user, products, stats, deliveries = [] }: SellerDashboardProps) {
     const [isAddOpen, setIsAddOpen] = useState(false)
     const router = useRouter()
+
+    // Cache data for offline use
+    useEffect(() => {
+        if (stats) saveToOfflineStorage(OFFLINE_CACHE_KEYS.USER_PROFILE + '_stats', stats);
+        if (products) saveToOfflineStorage(OFFLINE_CACHE_KEYS.PRODUCTS, products);
+        if (deliveries) saveToOfflineStorage(OFFLINE_CACHE_KEYS.DELIVERIES + '_seller', deliveries);
+    }, [stats, products, deliveries]);
 
     return (
         <div className="min-h-screen bg-background pb-24">
@@ -219,7 +227,7 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
                                             </div>
 
                                             {delivery.items && delivery.items.length > 0 && (
-                                                <div className="mt-3 pt-3 border-t text-xs text-muted-foreground">
+                                                <div className="mt-3 pt-3 border-t text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
                                                     {delivery.items.map((item: any, idx: number) => (
                                                         <span key={idx} className="mr-2">
                                                             {item.quantity}x {item.name}
@@ -227,6 +235,14 @@ export function SellerDashboard({ user, products, stats, deliveries = [] }: Sell
                                                     ))}
                                                 </div>
                                             )}
+
+                                            <div className="mt-4">
+                                                <Link href={`/deliveries/${delivery.id}`}>
+                                                    <Button variant="outline" size="sm" className="w-full text-xs">
+                                                        Gérer la commande
+                                                    </Button>
+                                                </Link>
+                                            </div>
                                         </CardContent>
                                     </Card>
                                 ))

@@ -122,14 +122,15 @@ model DeliveryPoint {
 }
 
 model Delivery {
-  id               String         @id @default(cuid())
-  status           DeliveryStatus @default(CREATED)
-  deliveryPointId  String
-  pickupPointId    String? // Point of collection
-  courierId        String?
-  clientId         String
-  items            Json?
-  confirmationCode String?
+  id                      String         @id @default(cuid())
+  status                  DeliveryStatus @default(CREATED)
+  deliveryPointId         String
+  pickupPointId           String? // Point of collection
+  courierId               String?
+  clientId                String
+  items                   Json?
+  confirmationCode        String? // Code displayed to Client, given to Courier
+  courierConfirmationCode String? // Code displayed to Courier, given to Client
 
   deliveryPoint DeliveryPoint    @relation("DestinationPoint", fields: [deliveryPointId], references: [id])
   pickupPoint   DeliveryPoint?   @relation("PickupPoint", fields: [pickupPointId], references: [id])
@@ -138,10 +139,12 @@ model Delivery {
   proof         ProofOfDelivery?
   logs          DeliveryLog[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sellerId  String? // Added seller relation
-  seller    User?    @relation("SellerSales", fields: [sellerId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  sellerId           String? // Added seller relation
+  seller             User?    @relation("SellerSales", fields: [sellerId], references: [id])
+  confirmedByCourier Boolean  @default(false)
+  confirmedByClient  Boolean  @default(false)
 }
 
 model ProofOfDelivery {

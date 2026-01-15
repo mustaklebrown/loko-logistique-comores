@@ -7,6 +7,8 @@ import { getDeliveries } from "@/app/actions/delivery"
 import { getSession } from "@/lib/auth-server"
 import { DeliveryFilters } from "@/components/delivery/delivery-filters"
 
+import { DeliveriesList } from "@/components/delivery/deliveries-list"
+
 export default async function DeliveriesPage({
     searchParams
 }: {
@@ -56,18 +58,7 @@ export default async function DeliveriesPage({
                             )}
                         </div>
                     ) : (
-                        <div className="space-y-3">
-                            {deliveries.map((delivery) => (
-                                <DeliveryCard
-                                    key={delivery.id}
-                                    id={delivery.id}
-                                    status={delivery.status as any}
-                                    description={delivery.deliveryPoint?.description}
-                                    courierName={delivery.courier?.name}
-                                    createdAt={delivery.createdAt}
-                                />
-                            ))}
-                        </div>
+                        <DeliveriesList deliveries={deliveries} />
                     )}
                 </div>
             </main>

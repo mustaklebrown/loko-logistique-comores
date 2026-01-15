@@ -47,3 +47,7 @@ export const proofOfDeliverySchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
 });
+export const confirmReceiptSchema = z.object({
+  deliveryId: z.string(),
+  otp: z.string(),
+});

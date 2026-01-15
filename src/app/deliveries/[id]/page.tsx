@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 import { StatusActions } from "@/components/delivery/status-actions"
 import { AssignCourierForm } from "@/components/delivery/assign-courier-form"
 import { ProofOfDeliveryForm } from "@/components/delivery/proof-of-delivery-form"
+import { ConfirmReceiptForm } from "@/components/delivery/confirm-receipt-form"
 import Image from "next/image"
 
 const statusConfig = {
@@ -38,6 +39,8 @@ export default async function DeliveryDetailPage({
     const delivery = result.delivery
     const status = statusConfig[delivery.status as keyof typeof statusConfig]
     const isClient = session?.user.id === delivery.clientId
+    const isSeller = session?.user.id === delivery.sellerId
+    const isAdmin = session?.user.role === 'admin'
     const items = (delivery.items as any[]) || []
 
     return (
@@ -67,7 +70,7 @@ export default async function DeliveryDetailPage({
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base flex items-center justify-center gap-2 text-primary">
                                 <Key className="h-4 w-4" />
-                                Code de Confirmation
+                                Votre Code de Réception
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -75,7 +78,27 @@ export default async function DeliveryDetailPage({
                                 {delivery.confirmationCode}
                             </div>
                             <p className="text-xs text-center text-muted-foreground mt-2">
-                                Communiquez ce code au coursier lors de la réception pour valider la livraison.
+                                Communiquez ce code au coursier lors de la réception pour qu'il puisse valider son arrivée.
+                            </p>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Courier Code Card (Courier Only) */}
+                {delivery.courierId === session?.user.id && delivery.status !== 'DELIVERED' && delivery.status !== 'FAILED' && (delivery as any).courierConfirmationCode && (
+                    <Card className="bg-amber-50 border-amber-200">
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-base flex items-center justify-center gap-2 text-amber-700">
+                                <Key className="h-4 w-4" />
+                                Code à donner au Client
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-4xl font-bold tracking-[0.2em] text-center text-amber-600 font-mono">
+                                {(delivery as any).courierConfirmationCode}
+                            </div>
+                            <p className="text-xs text-center text-amber-600/70 mt-2">
+                                Donnez ce code au client lorsqu'il reçoit son colis.
                             </p>
                         </CardContent>
                     </Card>
@@ -257,13 +280,13 @@ export default async function DeliveryDetailPage({
                     </Card>
                 )}
 
-                {/* Assignment Form (If NOT assigned and user is courier/admin) */}
-                {!delivery.courier && (
+                {/* Assignment Form */}
+                {!delivery.courier && (isSeller || isAdmin || (!delivery.sellerId && session?.user.role === 'courier')) && (
                     <Card className="border-primary/30 bg-primary/5">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base flex items-center gap-2 text-primary">
                                 <User className="h-4 w-4" />
-                                Assignation
+                                {isSeller ? "Confirmer & Assigner un coursier" : "Assignation"}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -271,7 +294,21 @@ export default async function DeliveryDetailPage({
                                 deliveryId={delivery.id}
                                 currentUserId={session?.user.id}
                                 userRole={session?.user.role || undefined}
+                                isSeller={isSeller}
                             />
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Seller Message for Couriers */}
+                {!delivery.courier && delivery.sellerId && session?.user.role === 'courier' && !isSeller && (
+                    <Card className="border-amber-200 bg-amber-50">
+                        <CardContent className="p-4 flex items-center gap-3">
+                            <Clock className="h-5 w-5 text-amber-500" />
+                            <p className="text-sm text-amber-700">
+                                Cette commande attend d'être confirmée par le vendeur.
+                                Il vous assignera directement s'il choisit votre service.
+                            </p>
                         </CardContent>
                     </Card>
                 )}
@@ -372,8 +409,45 @@ export default async function DeliveryDetailPage({
                 )}
 
                 {/* Proof of Delivery Form - Show when courier arrived */}
-                {delivery.status === "ARRIVED_ZONE" && (
+                {delivery.status === "ARRIVED_ZONE" && delivery.courierId === session?.user.id && (
                     <ProofOfDeliveryForm deliveryId={delivery.id} />
+                )}
+
+                {/* Confirm Receipt Form - Show to Client when courier is active */}
+                {isClient && delivery.status !== 'DELIVERED' && delivery.status !== 'FAILED' && !!delivery.courierId && (
+                    <ConfirmReceiptForm
+                        deliveryId={delivery.id}
+                        isConfirmed={(delivery as any).confirmedByClient}
+                    />
+                )}
+
+                {/* Dual confirmation status info */}
+                {delivery.status !== 'DELIVERED' && delivery.status !== 'FAILED' && !!delivery.courierId && (
+                    <Card className="bg-muted/30 border-dashed">
+                        <CardContent className="p-4 space-y-2">
+                            <h4 className="text-xs font-bold uppercase text-muted-foreground">Progression de la remise</h4>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="flex items-center gap-2">
+                                        {(delivery as any).confirmedByCourier ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Clock className="h-4 w-4 text-muted-foreground" />}
+                                        Présence du coursier
+                                    </span>
+                                    <Badge variant={(delivery as any).confirmedByCourier ? "default" : "outline"} className={(delivery as any).confirmedByCourier ? "bg-emerald-500 hover:bg-emerald-600" : ""}>
+                                        {(delivery as any).confirmedByCourier ? "Validé" : "En attente"}
+                                    </Badge>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="flex items-center gap-2">
+                                        {(delivery as any).confirmedByClient ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Clock className="h-4 w-4 text-muted-foreground" />}
+                                        Réception par le client
+                                    </span>
+                                    <Badge variant={(delivery as any).confirmedByClient ? "default" : "outline"} className={(delivery as any).confirmedByClient ? "bg-emerald-500 hover:bg-emerald-600" : ""}>
+                                        {(delivery as any).confirmedByClient ? "Validé" : "En attente"}
+                                    </Badge>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 )}
             </main>
 

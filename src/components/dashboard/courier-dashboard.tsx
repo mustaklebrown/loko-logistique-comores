@@ -14,7 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { saveToOfflineStorage, OFFLINE_CACHE_KEYS } from "@/lib/offline-storage";
 
 export interface CourierDashboardProps {
     user: {
@@ -42,6 +44,13 @@ const statusLabels: Record<string, string> = {
 
 export function CourierDashboard({ user, deliveries }: CourierDashboardProps) {
     const router = useRouter();
+
+    // Cache data for offline use
+    useEffect(() => {
+        if (deliveries) {
+            saveToOfflineStorage(OFFLINE_CACHE_KEYS.DELIVERIES + '_courier', deliveries);
+        }
+    }, [deliveries]);
 
     const handleSignOut = async () => {
         await signOut();
@@ -72,7 +81,7 @@ export function CourierDashboard({ user, deliveries }: CourierDashboardProps) {
                 <div className="max-w-lg mx-auto px-4">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                 <span className="text-white font-bold">
                                     {user.name?.charAt(0).toUpperCase()}
                                 </span>

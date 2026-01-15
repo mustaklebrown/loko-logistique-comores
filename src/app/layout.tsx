@@ -64,6 +64,7 @@ export const viewport = {
 };
 
 import { Providers } from "@/components/providers";
+import { OfflineAlert } from "@/components/layout/offline-alert";
 
 export default function RootLayout({
   children,
@@ -75,7 +76,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <OfflineAlert />
+          {children}
+        </Providers>
       </body>
     </html>
   );

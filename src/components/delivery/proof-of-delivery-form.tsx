@@ -117,25 +117,22 @@ export function ProofOfDeliveryForm({ deliveryId }: ProofOfDeliveryFormProps) {
 
                 {/* OTP Code (Required) */}
                 <div className="space-y-2">
-                    <Label htmlFor="otp">Code de confirmation (Requis)</Label>
+                    <Label htmlFor="otp">Code donné par le Client (Requis)</Label>
                     <Input
                         id="otp"
                         type="text"
                         pattern="[0-9]*"
                         inputMode="numeric"
-                        placeholder="Ex: 1234"
+                        placeholder="Entrez le code du client"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                         maxLength={4}
                         className="text-center text-lg tracking-widest font-mono"
                     />
+                    <p className="text-[10px] text-muted-foreground italic">
+                        Ce code prouve votre présence physique chez le client.
+                    </p>
                 </div>
-
-                {/* Photo capture placeholder */}
-                <Button variant="outline" className="w-full gap-2" disabled>
-                    <Camera className="h-4 w-4" />
-                    Prendre une photo (bientôt)
-                </Button>
 
                 {/* Submit */}
                 <Button
